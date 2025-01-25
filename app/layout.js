@@ -1,3 +1,8 @@
+
+import '@fontsource/inter/400.css';  // Regular weight
+import '@fontsource/inter/600.css';  // Semi-bold weight
+import '@fontsource/inter/700.css';  // Bold weight
+
 import { GoogleTagManager } from "@next/third-parties/google";
 import { Inter } from "next/font/google";
 import { ToastContainer } from "react-toastify";

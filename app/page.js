@@ -1,4 +1,7 @@
+"use client"; // Add this at the top to make it a client component
+
 import { personalData } from "@/utils/data/personal-data";
+import { useEffect, useState } from "react";
 import AboutSection from "./components/homepage/about";
 import ContactSection from "./components/homepage/contact";
 import Education from "./components/homepage/education";
@@ -7,32 +10,44 @@ import HeroSection from "./components/homepage/hero-section";
 import Projects from "./components/homepage/projects";
 import Skills from "./components/homepage/skills";
 
-async function getData() {
-  const res = await fetch(`https://dev.to/api/articles?username=${personalData.devUsername}`)
+export default function Home() {
+  const [articles, setArticles] = useState([]);
+  const [error, setError] = useState(null);
 
-  if (!res.ok) {
-    throw new Error('Failed to fetch data')
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = await fetch(
+          `https://dev.to/api/articles?username=${personalData.devUsername}`
+        );
+        if (!res.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        const data = await res.json();
+        const filtered = data
+          .filter((item) => item?.cover_image)
+          .sort(() => Math.random() - 0.5);
+        setArticles(filtered);
+      } catch (err) {
+        setError(err.message);
+      }
+    }
+    fetchData();
+  }, []);
+
+  if (error) {
+    return <div>Error: {error}</div>;
   }
 
-  const data = await res.json();
-
-  const filtered = data.filter((item) => item?.cover_image).sort(() => Math.random() - 0.5);
-
-  return filtered;
-};
-
-export default async function Home() {
-  
-
   return (
-    <div suppressHydrationWarning >
+    <div>
       <HeroSection />
       <AboutSection />
       <Experience />
       <Skills />
-      <Projects />
+      <Projects articles={articles} /> {/* Pass fetched data to Projects */}
       <Education />
       <ContactSection />
     </div>
-  )
-};
+  );
+}
